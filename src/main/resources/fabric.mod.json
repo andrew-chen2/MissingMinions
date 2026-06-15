@@ -14,19 +14,12 @@
 	"icon": "assets/missingminions/icon.png",
 	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"com.github.andrewchen2.missingminions.MissingMinions"
-		],
 		"client": [
-			"com.github.andrewchen2.missingminions.client.MissingMinionsClient"
+			"com.github.andrewchen2.missingminions.MissingMinions"
 		]
 	},
 	"mixins": [
-		"missingminions.mixins.json",
-		{
-			"config": "missingminions.client.mixins.json",
-			"environment": "client"
-		}
+		"missingminions.mixins.json"
 	],
 	"depends": {
 		"fabricloader": ">=0.19.3",
