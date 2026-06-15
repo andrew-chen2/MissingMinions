@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.scoreboard.*;
 import net.minecraft.text.Text;
 import net.minecraft.util.Colors;
 import net.minecraft.util.Identifier;
@@ -41,7 +42,8 @@ public class MissingMinions implements ClientModInitializer {
 				Identifier.of("missingminions", "status_text"),
 				(context, tickCounter) -> {
 					MinecraftClient client = MinecraftClient.getInstance();
-					if (client.player != null && client.textRenderer != null) {
+
+					if (client.player != null && client.textRenderer != null && isOnPrivateIsland()) {
 						String hudText = "Placeholder text (MissingMinions)";
 						int x = 10;
 						int y = 10;
@@ -58,5 +60,29 @@ public class MissingMinions implements ClientModInitializer {
 		context.getSource().sendFeedback(Text.literal("Placeholder text (MissingMinions)"));
 
 		return 1; // Successful command execution
+	}
+
+	private boolean isOnPrivateIsland() {
+		MinecraftClient client = MinecraftClient.getInstance();
+		if (client.world == null) return false;
+
+		Scoreboard scoreboard = client.world.getScoreboard();
+
+		ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
+		if (objective == null) return false;
+
+		// Iterate through scoreboard lines
+		for (Team team : scoreboard.getTeams()) {
+			for (String entry : team.getPlayerList()) {
+				// Construct full line
+				Text prefix = team.getPrefix();
+				Text suffix = team.getSuffix();
+				String fullLine = prefix.getString() + entry + suffix.getString();
+
+				if (fullLine.contains("§7⏣ §aYour Isla§t§and")) return true;
+			}
+		}
+
+		return false;
 	}
 }
