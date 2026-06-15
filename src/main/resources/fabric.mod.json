@@ -3,13 +3,12 @@
 	"id": "missingminions",
 	"version": "${version}",
 	"name": "MissingMinions",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Calculate the cheapest missing minions for Hypixel Skyblock.",
 	"authors": [
-		"Me!"
+		"andrew-chen2"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/andrew-chen2/MissingMinions"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/missingminions/icon.png",
