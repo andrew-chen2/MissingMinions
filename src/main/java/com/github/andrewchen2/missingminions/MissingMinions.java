@@ -6,7 +6,12 @@ import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
+import net.minecraft.util.Colors;
+import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +34,23 @@ public class MissingMinions implements ClientModInitializer {
 					.executes(this::executeCommand)
 			);
 		}));
+
+		// Register HUD overlay
+		HudElementRegistry.attachElementAfter(
+				VanillaHudElements.CHAT,
+				Identifier.of("missingminions", "status_text"),
+				(context, tickCounter) -> {
+					MinecraftClient client = MinecraftClient.getInstance();
+					if (client.player != null && client.textRenderer != null) {
+						String hudText = "Placeholder text (MissingMinions)";
+						int x = 10;
+						int y = 10;
+
+						// Draw text
+						context.drawText(client.textRenderer, hudText, x, y, Colors.WHITE, true);
+					}
+				}
+		);
 	}
 
 	private int executeCommand(CommandContext<FabricClientCommandSource> context) {
