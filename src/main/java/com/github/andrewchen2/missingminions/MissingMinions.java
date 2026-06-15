@@ -6,7 +6,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.minecraft.network.chat.Component;
+import net.minecraft.text.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class MissingMinions implements ClientModInitializer {
 
 	private int executeCommand(CommandContext<FabricClientCommandSource> context) {
 		// Send message
-		context.getSource().sendFeedback(Component.literal("Testing command."));
+		context.getSource().sendFeedback(Text.literal("Placeholder text (MissingMinions)"));
 
 		return 1; // Successful command execution
 	}
