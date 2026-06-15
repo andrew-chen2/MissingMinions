@@ -63,13 +63,17 @@ public class MissingMinions implements ClientModInitializer {
 	}
 
 	private boolean isOnPrivateIsland() {
+		return getZone().equals("Your Island");
+	}
+
+	private String getZone() {
 		MinecraftClient client = MinecraftClient.getInstance();
-		if (client.world == null) return false;
+		if (client.world == null) return "";
 
 		Scoreboard scoreboard = client.world.getScoreboard();
 
 		ScoreboardObjective objective = scoreboard.getObjectiveForSlot(ScoreboardDisplaySlot.SIDEBAR);
-		if (objective == null) return false;
+		if (objective == null) return "";
 
 		// Iterate through scoreboard lines
 		for (Team team : scoreboard.getTeams()) {
@@ -79,10 +83,15 @@ public class MissingMinions implements ClientModInitializer {
 				Text suffix = team.getSuffix();
 				String fullLine = prefix.getString() + entry + suffix.getString();
 
-				if (fullLine.contains("§7⏣ §aYour Isla§t§and")) return true;
+				// Zone (island) line starts with a "⏣"
+				if (fullLine.contains("§7⏣")) {
+					// Remove formatting codes
+					String cleanLine = fullLine.replaceAll("(?i)§[0-9A-Z]", "");
+					return cleanLine.replace("⏣", "").strip();
+				}
 			}
 		}
 
-		return false;
+		return "";
 	}
 }
