@@ -22,6 +22,9 @@ public class MinionLogic {
     public static void calculateMissing(List<String> unlockedMinions) {
         ChatUtils.sendMessage("§7Calculating costs for missing minions...");
 
+        // Clear cache
+        RecipeCalculator.COST_CACHE.clear();
+
         List<String> missingIds = new ArrayList<>();
         for (String minionId : ItemsApi.MASTER_MINION_LIST) {
             if (!unlockedMinions.contains(minionId)) {

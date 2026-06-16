@@ -1,5 +1,6 @@
 package com.github.andrewchen2.missingminions.util;
 
+import com.github.andrewchen2.missingminions.config.ModConfig;
 import com.github.andrewchen2.missingminions.network.BazaarApi;
 import com.github.andrewchen2.missingminions.network.RecipesApi;
 import com.google.gson.JsonElement;
@@ -33,7 +34,10 @@ public class RecipeCalculator {
                 int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
 
                 if (itemId.contains("_GENERATOR_")) {
-                    totalCost += calculateMinionCost(itemId);
+                    // Only calculate recursively if config option is enabled
+                    if (ModConfig.useRecursiveCost) {
+                        totalCost += calculateMinionCost(itemId);
+                    }
                 } else {
                     totalCost += (BazaarApi.getBuyPrice(itemId) * amount);
                 }
