@@ -1,10 +1,13 @@
 package com.github.andrewchen2.missingminions.util;
 
+import com.github.andrewchen2.missingminions.config.ModConfig;
+import com.github.andrewchen2.missingminions.network.CollectionsApi;
 import com.github.andrewchen2.missingminions.network.ItemsApi;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 public class MinionLogic {
 
@@ -19,7 +22,7 @@ public class MinionLogic {
         }
     }
 
-    public static void calculateMissing(List<String> unlockedMinions) {
+    public static void calculateMissing(List<String> unlockedMinions, Map<String, Integer> playerCollections) {
         ChatUtils.sendMessage("§7Calculating costs for missing minions...");
 
         // Clear cache
@@ -28,6 +31,21 @@ public class MinionLogic {
         List<String> missingIds = new ArrayList<>();
         for (String minionId : ItemsApi.MASTER_MINION_LIST) {
             if (!unlockedMinions.contains(minionId)) {
+                // Collection filter
+                if (ModConfig.filterCollections) {
+                    String prefix = minionId.split("_GENERATOR_")[0];
+                    CollectionsApi.CollectionReq req = CollectionsApi.MINION_REQS.get(prefix);
+
+                    if (req != null) {
+                        // Skip this minion if not yet unlocked in collection
+                        int playerTier = playerCollections.getOrDefault(req.collectionId, 0);
+                        if (playerTier < req.tier) {
+                            System.out.println("excluded minion: " + minionId);
+                            continue;
+                        }
+                    }
+                }
+
                 missingIds.add(minionId);
             }
         }

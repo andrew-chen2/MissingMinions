@@ -125,7 +125,7 @@ public class HypixelApi {
                 }
             }
 
-            MinionLogic.calculateMissing(unlockedMinions);
+            MinionLogic.calculateMissing(unlockedMinions, playerCollections);
         } catch (Exception e) {
             ChatUtils.sendMessage("§cError parsing data.");
         }
