@@ -38,7 +38,7 @@ public class ItemsApi {
                                     MASTER_MINION_LIST.add(id);
                                 }
                             }
-                            System.out.println("[MissingMinions] Successfully cached " + MASTER_MINION_LIST.size() + " minion IDs");
+                            System.out.println("[MissingMinions] Successfully cached " + MASTER_MINION_LIST.size() + " minion IDs!");
                         }
                     }
                 })
