@@ -10,8 +10,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RecipeCalculator {
+    // Cache calculated minion costs (minion ID, cost)
+    public static final Map<String, Double> COST_CACHE = new HashMap<>();
+
     public static double calculateRecipeCost(JsonObject recipe) {
         double totalCost = 0.0;
 
@@ -43,10 +48,17 @@ public class RecipeCalculator {
         // Skip Tier 12 for now
         if (minionId.contains("12")) return 0.0;
 
+        // Check cache
+        if (COST_CACHE.containsKey(minionId)) {
+            return COST_CACHE.get(minionId);
+        }
+
+        double cost = 0.0;
+
         if (RecipesApi.RECIPES != null && RecipesApi.RECIPES.has(minionId)) {
             try {
-                JsonObject recipeObj = RecipesApi.RECIPES.getAsJsonObject(minionId);
-                return calculateRecipeCost(recipeObj.getAsJsonObject("recipe"));
+                JsonObject recipeObj = RecipesApi.RECIPES.getAsJsonObject(minionId).getAsJsonObject("recipe");
+                cost = calculateRecipeCost(recipeObj);
             } catch (Exception e) {
                 System.err.println("Failed to parse bulk recipe for: " + minionId);
             }
@@ -66,12 +78,12 @@ public class RecipeCalculator {
                 JsonObject itemJson = JsonParser.parseString(response.body()).getAsJsonObject();
                 // If an item has multiple recipes, they will be in a "recipes" array
                 if (itemJson.has("recipe")) {
-                    return calculateRecipeCost(itemJson.getAsJsonObject("recipe"));
+                    cost = calculateRecipeCost(itemJson.getAsJsonObject("recipe"));
                 } else if (itemJson.has("recipes")) {
                     for (JsonElement recipeElement : itemJson.getAsJsonArray("recipes")) {
                         JsonObject recipeObj = recipeElement.getAsJsonObject();
                         if (recipeObj.has("type") && recipeObj.get("type").getAsString().equals("crafting")) {
-                            return calculateRecipeCost(recipeObj);
+                            cost = calculateRecipeCost(recipeObj);
                         }
                     }
                 }
@@ -80,6 +92,7 @@ public class RecipeCalculator {
             System.err.println("Failed to fetch minion recipe for: " + minionId);
         }
 
-        return 0.0;
+        COST_CACHE.put(minionId, cost);
+        return cost;
     }
 }
