@@ -62,34 +62,34 @@ public class RecipeCalculator {
             } catch (Exception e) {
                 System.err.println("Failed to parse bulk recipe for: " + minionId);
             }
-        }
+        } else {
+            try {
+                System.out.println("Falling back to individual fetch for: " + minionId);
+                HttpClient client = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/items/" + minionId + ".json"))
+                        .GET()
+                        .build();
 
-        try {
-            System.out.println("Falling back to individual fetch for: " + minionId);
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/items/" + minionId + ".json"))
-                    .GET()
-                    .build();
+                HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                JsonObject itemJson = JsonParser.parseString(response.body()).getAsJsonObject();
-                // If an item has multiple recipes, they will be in a "recipes" array
-                if (itemJson.has("recipe")) {
-                    cost = calculateRecipeCost(itemJson.getAsJsonObject("recipe"));
-                } else if (itemJson.has("recipes")) {
-                    for (JsonElement recipeElement : itemJson.getAsJsonArray("recipes")) {
-                        JsonObject recipeObj = recipeElement.getAsJsonObject();
-                        if (recipeObj.has("type") && recipeObj.get("type").getAsString().equals("crafting")) {
-                            cost = calculateRecipeCost(recipeObj);
+                if (response.statusCode() == 200) {
+                    JsonObject itemJson = JsonParser.parseString(response.body()).getAsJsonObject();
+                    // If an item has multiple recipes, they will be in a "recipes" array
+                    if (itemJson.has("recipe")) {
+                        cost = calculateRecipeCost(itemJson.getAsJsonObject("recipe"));
+                    } else if (itemJson.has("recipes")) {
+                        for (JsonElement recipeElement : itemJson.getAsJsonArray("recipes")) {
+                            JsonObject recipeObj = recipeElement.getAsJsonObject();
+                            if (recipeObj.has("type") && recipeObj.get("type").getAsString().equals("crafting")) {
+                                cost = calculateRecipeCost(recipeObj);
+                            }
                         }
                     }
                 }
+            } catch (Exception e) {
+                System.err.println("Failed to fetch minion recipe for: " + minionId);
             }
-        } catch (Exception e) {
-            System.err.println("Failed to fetch minion recipe for: " + minionId);
         }
 
         COST_CACHE.put(minionId, cost);
