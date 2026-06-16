@@ -39,8 +39,10 @@ public class BazaarApi {
     public static double getBuyPrice(String itemId) {
         if (BAZAAR_DATA == null) return 0.0;
 
-        if (BAZAAR_DATA.has(itemId)) {
-            return BAZAAR_DATA.getAsJsonObject(itemId)
+        String cleanId = itemId.replace("-", ":");
+
+        if (BAZAAR_DATA.has(cleanId)) {
+            return BAZAAR_DATA.getAsJsonObject(cleanId)
                     .getAsJsonObject("quick_status")
                     .get("buyPrice").getAsDouble();
         }
