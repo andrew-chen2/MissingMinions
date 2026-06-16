@@ -17,7 +17,7 @@ public class MMCommand {
     }
 
     private static int execute(CommandContext<FabricClientCommandSource> context) {
-        context.getSource().sendFeedback(Text.literal("§b[MissingMinions] §7Fetching profile data..."));
+        context.getSource().sendFeedback(Text.literal("§9[MissingMinions] §7Fetching profile data..."));
 
         // Get player UUID
         String playerUUID = context.getSource().getPlayer().getUuidAsString().replace("-", "");

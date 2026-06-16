@@ -10,7 +10,7 @@ public class ChatUtils {
         // Push to the main thread to prevent OpenGL rendering crashes
         client.execute(() -> {
             if (client.player != null) {
-                client.player.sendMessage(Text.literal("§b[MissingMinions] §r" + message), false);
+                client.player.sendMessage(Text.literal("§9[MissingMinions] §r" + message), false);
             }
         });
     }
