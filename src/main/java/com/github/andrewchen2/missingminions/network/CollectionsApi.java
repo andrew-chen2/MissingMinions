@@ -69,8 +69,6 @@ public class CollectionsApi {
                             }
                         }
                         System.out.println("[MissingMinions] Successfully mapped " + MINION_REQS.size() + " collection requirements!");
-                        System.out.println(MINION_REQS.get("REDSTONE").collectionId);
-                        System.out.println(MINION_REQS.get("REDSTONE").tier);
                     }
                 })
                 .exceptionally(e -> {
