@@ -22,16 +22,31 @@ public class MinionLogic {
     public static void calculateMissing(List<String> unlockedMinions) {
         ChatUtils.sendMessage("§7Calculating costs for missing minions...");
 
-        List<Minion> missingMinions = new ArrayList<>();
-
+        List<String> missingIds = new ArrayList<>();
         for (String minionId : ItemsApi.MASTER_MINION_LIST) {
             if (!unlockedMinions.contains(minionId)) {
-                double cost = RecipeCalculator.calculateMinionCost(minionId);
+                missingIds.add(minionId);
+            }
+        }
 
-                // Only add to list if a valid cost was found
-                if (cost > 0) {
-                    missingMinions.add(new Minion(minionId, cost));
-                }
+        // Sort by tier
+        missingIds.sort(Comparator.comparingInt(id -> {
+            try {
+                String[] parts = id.split("_");
+                return Integer.parseInt(parts[parts.length - 1]);
+            } catch (Exception e) {
+                return 99; // Fallback so it goes to the end if parsing fails
+            }
+        }));
+
+        List<Minion> missingMinions = new ArrayList<>();
+
+        for (String minionId : missingIds) {
+            double cost = RecipeCalculator.calculateMinionCost(minionId);
+
+            // Only add to list if a valid cost was found
+            if (cost > 0) {
+                missingMinions.add(new Minion(minionId, cost));
             }
         }
 
