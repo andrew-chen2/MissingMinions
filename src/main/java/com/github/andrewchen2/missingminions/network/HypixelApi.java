@@ -1,11 +1,10 @@
 package com.github.andrewchen2.missingminions.network;
 
+import com.github.andrewchen2.missingminions.util.ChatUtils;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.Text;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -30,11 +29,11 @@ public class HypixelApi {
                     if (response.statusCode() == 200) {
                         parseMinionData(response.body(), uuid);
                     } else {
-                        sendMessage("§cAPI Error: " + response.statusCode());
+                        ChatUtils.sendMessage("§cAPI Error: " + response.statusCode());
                     }
                 })
                 .exceptionally(e -> {
-                    sendMessage("§cConnection failed.");
+                    ChatUtils.sendMessage("§cConnection failed.");
                     return null;
                 });
     }
@@ -44,13 +43,13 @@ public class HypixelApi {
             JsonObject jsonResponse = JsonParser.parseString(json).getAsJsonObject();
 
             if (!jsonResponse.has("profiles") || jsonResponse.get("profiles").isJsonNull()) {
-                sendMessage("§cNo profiles found for this player.");
+                ChatUtils.sendMessage("§cNo profiles found for this player.");
                 return;
             }
 
             JsonArray profiles = jsonResponse.getAsJsonArray("profiles");
             if (profiles.isEmpty()) {
-                sendMessage("§cPlayer has no Skyblock profiles.");
+                ChatUtils.sendMessage("§cPlayer has no Skyblock profiles.");
                 return;
             }
 
@@ -72,7 +71,7 @@ public class HypixelApi {
             JsonObject members = activeProfile.getAsJsonObject("members");
 
             if (!members.has(uuid)) {
-                sendMessage("§cCould not find player data in profile.");
+                ChatUtils.sendMessage("§cCould not find player data in profile.");
                 return;
             }
 
@@ -86,7 +85,7 @@ public class HypixelApi {
             }
 
             if (craftedGenerators == null || craftedGenerators.isEmpty()) {
-                sendMessage("§eYou haven't crafted any minions on this profile yet!");
+                ChatUtils.sendMessage("§eYou haven't crafted any minions on this profile yet!");
                 return;
             }
 
@@ -97,21 +96,9 @@ public class HypixelApi {
                 unlockedMinions.add(minion.getAsString());
             }
 
-            sendMessage("§aSuccessfully parsed §e" + unlockedMinions.size() + " §aunlocked minion tiers!");
+            ChatUtils.sendMessage("§aSuccessfully parsed §e" + unlockedMinions.size() + " §aunlocked minion tiers!");
         } catch (Exception e) {
-            sendMessage("§cError parsing data.");
+            ChatUtils.sendMessage("§cError parsing data.");
         }
-    }
-
-    // Helper to send messages to the player
-    private static void sendMessage(String message) {
-        MinecraftClient client = MinecraftClient.getInstance();
-
-        // Push the task back to the main game thread
-        client.execute(() -> {
-            if (client.player != null) {
-                client.player.sendMessage(Text.literal("§b[MissingMinions] §r" + message), false);
-            }
-        });
     }
 }
