@@ -1,5 +1,6 @@
 package com.github.andrewchen2.missingminions.commands;
 
+import com.github.andrewchen2.missingminions.config.ModConfig;
 import com.github.andrewchen2.missingminions.network.BazaarApi;
 import com.github.andrewchen2.missingminions.network.HypixelApi;
 import com.mojang.brigadier.context.CommandContext;
@@ -11,8 +12,16 @@ import net.minecraft.text.Text;
 public class MMCommand {
     public static void register() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
-            dispatcher.register(ClientCommandManager.literal("missingminions").executes(MMCommand::execute));
-            dispatcher.register(ClientCommandManager.literal("mm").executes(MMCommand::execute));
+            dispatcher.register(ClientCommandManager.literal("missingminions").executes(MMCommand::execute)
+                    .then(ClientCommandManager.literal("toggle")
+                            .then(ClientCommandManager.literal("recursive").executes(MMCommand::toggleRecursive))
+                            .then(ClientCommandManager.literal("filter").executes(MMCommand::toggleFilter))
+                    ));
+            dispatcher.register(ClientCommandManager.literal("mm").executes(MMCommand::execute)
+                    .then(ClientCommandManager.literal("toggle")
+                            .then(ClientCommandManager.literal("recursive").executes(MMCommand::toggleRecursive))
+                            .then(ClientCommandManager.literal("filter").executes(MMCommand::toggleFilter))
+                    ));
         });
     }
 
@@ -27,5 +36,25 @@ public class MMCommand {
                 .thenRun(() -> HypixelApi.fetchMinions(playerUUID));
 
         return 1; // Successful command execution
+    }
+
+    private static int toggleRecursive(CommandContext<FabricClientCommandSource> context) {
+        boolean current = ModConfig.useRecursiveCost;
+        ModConfig.setUseRecursiveCost(!current); // This automatically saves and clears the cache!
+
+        String state = ModConfig.useRecursiveCost ? "§aON" : "§cOFF";
+        context.getSource().sendFeedback(Text.literal("§9[MissingMinions] §7Recursive Cost Calculation is now: " + state));
+
+        return 1;
+    }
+
+    private static int toggleFilter(CommandContext<FabricClientCommandSource> context) {
+        boolean current = ModConfig.filterCollections;
+        ModConfig.setFilterCollections(!current); // This automatically saves!
+
+        String state = ModConfig.filterCollections ? "§aON" : "§cOFF";
+        context.getSource().sendFeedback(Text.literal("§9[MissingMinions] §7Collection Filtering is now: " + state));
+
+        return 1;
     }
 }
