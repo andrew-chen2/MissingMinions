@@ -2,7 +2,6 @@ package com.github.andrewchen2.missingminions;
 
 import com.github.andrewchen2.missingminions.commands.MMCommand;
 import com.github.andrewchen2.missingminions.hud.MainHud;
-import com.github.andrewchen2.missingminions.network.BazaarApi;
 import com.github.andrewchen2.missingminions.network.ItemsApi;
 import net.fabricmc.api.ClientModInitializer;
 
@@ -16,7 +15,6 @@ public class MissingMinions implements ClientModInitializer {
 	public void onInitializeClient() {
 		LOGGER.info("MissingMinions loaded.");
 
-		BazaarApi.fetchBazaarData();
 		ItemsApi.fetchItems();
 
 		MainHud.register();

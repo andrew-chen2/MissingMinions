@@ -1,5 +1,6 @@
 package com.github.andrewchen2.missingminions.commands;
 
+import com.github.andrewchen2.missingminions.network.BazaarApi;
 import com.github.andrewchen2.missingminions.network.HypixelApi;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
@@ -21,8 +22,9 @@ public class MMCommand {
         // Get player UUID
         String playerUUID = context.getSource().getPlayer().getUuidAsString().replace("-", "");
 
-        // Fetch data
-        HypixelApi.fetchMinions(playerUUID);
+        // Fetch data (Bazaar, then minions)
+        BazaarApi.fetchBazaarData()
+                .thenRun(() -> HypixelApi.fetchMinions(playerUUID));
 
         return 1; // Successful command execution
     }

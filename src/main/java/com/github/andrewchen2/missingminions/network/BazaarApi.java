@@ -7,19 +7,20 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.CompletableFuture;
 
 public class BazaarApi {
     // JSON object with all Bazaar prices
     public static JsonObject BAZAAR_DATA = null;
 
-    public static void fetchBazaarData() {
+    public static CompletableFuture<Void> fetchBazaarData() {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://api.hypixel.net/v2/skyblock/bazaar"))
                 .GET()
                 .build();
 
-        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
                         JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
