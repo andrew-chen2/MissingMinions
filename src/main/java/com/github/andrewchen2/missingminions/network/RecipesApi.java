@@ -23,7 +23,7 @@ public class RecipesApi {
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
                         RECIPES = JsonParser.parseString(response.body()).getAsJsonObject();
-                        System.out.println("[MissingMinions] Successfully cached recipes!");
+                        System.out.println("[MissingMinions] Successfully cached " + RECIPES.size() + " recipes!");
                     }
                 })
                 .exceptionally(e -> {
