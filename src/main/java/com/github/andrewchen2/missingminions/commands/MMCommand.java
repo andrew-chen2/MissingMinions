@@ -1,5 +1,6 @@
 package com.github.andrewchen2.missingminions.commands;
 
+import com.github.andrewchen2.missingminions.network.HypixelApi;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
@@ -15,11 +16,13 @@ public class MMCommand {
     }
 
     private static int execute(CommandContext<FabricClientCommandSource> context) {
+        context.getSource().sendFeedback(Text.literal("§b[MissingMinions] §7Fetching profile data..."));
+
         // Get player UUID
         String playerUUID = context.getSource().getPlayer().getUuidAsString().replace("-", "");
 
-        // Send message
-        context.getSource().sendFeedback(Text.literal("§b[MissingMinions] §7Placeholder text (UUID: %s)".formatted(playerUUID)));
+        // Fetch data
+        HypixelApi.fetchMinions(playerUUID);
 
         return 1; // Successful command execution
     }
