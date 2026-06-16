@@ -3,6 +3,7 @@ package com.github.andrewchen2.missingminions;
 import com.github.andrewchen2.missingminions.commands.MMCommand;
 import com.github.andrewchen2.missingminions.config.ModConfig;
 import com.github.andrewchen2.missingminions.hud.MainHud;
+import com.github.andrewchen2.missingminions.network.CollectionsApi;
 import com.github.andrewchen2.missingminions.network.ItemsApi;
 import com.github.andrewchen2.missingminions.network.RecipesApi;
 import net.fabricmc.api.ClientModInitializer;
@@ -21,6 +22,7 @@ public class MissingMinions implements ClientModInitializer {
 
 		ItemsApi.fetchItems();
 		RecipesApi.fetchRecipes();
+		CollectionsApi.fetchCollections();
 
 		MainHud.register();
 		MMCommand.register();
