@@ -12,13 +12,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HypixelApi {
     // Cloudflare worker
     private static final String PROXY_URL = "https://missingminions.andrewchen796.workers.dev/?uuid=";
 
-    public static void fetchMinions(String uuid) {
+    public static void fetchData(String uuid) {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(PROXY_URL + uuid))
@@ -28,7 +30,7 @@ public class HypixelApi {
         client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
-                        parseMinionData(response.body(), uuid);
+                        parseData(response.body(), uuid);
                     } else {
                         ChatUtils.sendMessage("§cAPI Error: " + response.statusCode());
                     }
@@ -39,7 +41,7 @@ public class HypixelApi {
                 });
     }
 
-    private static void parseMinionData(String json, String uuid) {
+    private static void parseData(String json, String uuid) {
         try {
             JsonObject jsonResponse = JsonParser.parseString(json).getAsJsonObject();
 
@@ -78,6 +80,7 @@ public class HypixelApi {
 
             JsonObject playerStats = members.getAsJsonObject(uuid);
 
+            // Parse minions
             JsonArray craftedGenerators = null;
             if (playerStats.has("crafted_generators")) {
                 craftedGenerators = playerStats.getAsJsonArray("crafted_generators");
@@ -95,6 +98,31 @@ public class HypixelApi {
 
             for (JsonElement minion : craftedGenerators) {
                 unlockedMinions.add(minion.getAsString());
+            }
+
+            // Parse collections
+            Map<String, Integer> playerCollections = new HashMap<>();
+            JsonArray collTiers = null;
+
+            if (playerStats.has("unlocked_coll_tiers")) {
+                collTiers = playerStats.getAsJsonArray("unlocked_coll_tiers");
+            } else if (playerStats.has("player_data") && playerStats.getAsJsonObject("player_data").has("unlocked_coll_tiers")) {
+                collTiers = playerStats.getAsJsonObject("player_data").getAsJsonArray("unlocked_coll_tiers");
+            }
+
+            if (collTiers != null) {
+                for (JsonElement coll : collTiers) {
+                    String collString = coll.getAsString();
+                    int lastIdx = collString.lastIndexOf('_');
+                    if (lastIdx != -1) {
+                        String collId = collString.substring(0, lastIdx);
+                        try {
+                            int tier = Integer.parseInt(collString.substring(lastIdx + 1));
+                            // Store the highest tier unlocked
+                            playerCollections.put(collId, Math.max(tier, playerCollections.getOrDefault(collId, 0)));
+                        } catch (NumberFormatException ignored) {}
+                    }
+                }
             }
 
             MinionLogic.calculateMissing(unlockedMinions);

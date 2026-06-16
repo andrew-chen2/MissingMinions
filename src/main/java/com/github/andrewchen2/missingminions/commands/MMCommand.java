@@ -33,7 +33,7 @@ public class MMCommand {
 
         // Fetch data (Bazaar, then minions)
         BazaarApi.fetchBazaarData()
-                .thenRun(() -> HypixelApi.fetchMinions(playerUUID));
+                .thenRun(() -> HypixelApi.fetchData(playerUUID));
 
         return 1; // Successful command execution
     }
