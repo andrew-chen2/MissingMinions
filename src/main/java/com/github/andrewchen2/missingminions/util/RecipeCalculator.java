@@ -56,10 +56,19 @@ public class RecipeCalculator {
             if (recipe.has(slot) && !recipe.get(slot).getAsString().isEmpty()) {
                 String itemData = recipe.get(slot).getAsString();
 
-                // Format is ITEM_ID:AMOUNT (bulk recipes use ; instead of :)
-                String[] parts = itemData.split("[:;]");
-                String itemId = parts[0];
-                int amount = parts.length > 1 ? Integer.parseInt(parts[1]) : 1;
+                // Parsing
+                int splitIdx = Math.max(itemData.lastIndexOf(':'), itemData.lastIndexOf(';'));
+
+                String itemId = itemData;
+                int amount = 1;
+
+                // Parse if there is a separator (; or :)
+                if (splitIdx != -1) {
+                    try {
+                        amount = Integer.parseInt(itemData.substring(splitIdx + 1));
+                        itemId = itemData.substring(0, splitIdx);
+                    } catch (NumberFormatException ignored) {}
+                }
 
                 if (itemId.contains("_GENERATOR_")) {
                     // Only calculate recursively if config option is enabled
@@ -103,9 +112,6 @@ public class RecipeCalculator {
             try {
                 JsonObject recipeObj = RecipesApi.RECIPES.getAsJsonObject(minionId).getAsJsonObject("recipe");
                 cost = calculateRecipeCost(recipeObj);
-                if (minionId.equals("DARK_OAK_GENERATOR_10")) {
-                    System.out.println(recipeObj.get("A1"));
-                }
             } catch (Exception e) {
                 System.err.println("Failed to parse bulk recipe for: " + minionId);
             }
