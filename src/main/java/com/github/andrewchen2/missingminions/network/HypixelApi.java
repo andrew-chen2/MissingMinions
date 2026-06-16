@@ -30,12 +30,11 @@ public class HypixelApi {
                     if (response.statusCode() == 200) {
                         parseMinionData(response.body(), uuid);
                     } else {
-                        sendMessage("§b[MissingMinions] §cAPI Error: " + response.statusCode());
+                        sendMessage("§cAPI Error: " + response.statusCode());
                     }
                 })
                 .exceptionally(e -> {
-                    sendMessage("§b[MissingMinions] §cConnection failed.");
-                    e.printStackTrace();
+                    sendMessage("§cConnection failed.");
                     return null;
                 });
     }
@@ -45,13 +44,13 @@ public class HypixelApi {
             JsonObject jsonResponse = JsonParser.parseString(json).getAsJsonObject();
 
             if (!jsonResponse.has("profiles") || jsonResponse.get("profiles").isJsonNull()) {
-                sendMessage("§b[MissingMinions] §cNo profiles found for this player.");
+                sendMessage("§cNo profiles found for this player.");
                 return;
             }
 
             JsonArray profiles = jsonResponse.getAsJsonArray("profiles");
             if (profiles.isEmpty()) {
-                sendMessage("§b[MissingMinions] §cPlayer has no Skyblock profiles.");
+                sendMessage("§cPlayer has no Skyblock profiles.");
                 return;
             }
 
@@ -73,7 +72,7 @@ public class HypixelApi {
             JsonObject members = activeProfile.getAsJsonObject("members");
 
             if (!members.has(uuid)) {
-                sendMessage("§b[MissingMinions] §cCould not find player data in profile.");
+                sendMessage("§cCould not find player data in profile.");
                 return;
             }
 
@@ -87,7 +86,7 @@ public class HypixelApi {
             }
 
             if (craftedGenerators == null || craftedGenerators.isEmpty()) {
-                sendMessage("§b[MissingMinions] §eYou haven't crafted any minions on this profile yet!");
+                sendMessage("§eYou haven't crafted any minions on this profile yet!");
                 return;
             }
 
@@ -98,10 +97,9 @@ public class HypixelApi {
                 unlockedMinions.add(minion.getAsString());
             }
 
-            sendMessage("§b[MissingMinions] §aSuccessfully parsed §e" + unlockedMinions.size() + " §aunlocked minion tiers!");
+            sendMessage("§aSuccessfully parsed §e" + unlockedMinions.size() + " §aunlocked minion tiers!");
         } catch (Exception e) {
-            sendMessage("§b[MissingMinions] §cError parsing Hypixel data.");
-            e.printStackTrace();
+            sendMessage("§cError parsing data.");
         }
     }
 
@@ -112,7 +110,7 @@ public class HypixelApi {
         // Push the task back to the main game thread
         client.execute(() -> {
             if (client.player != null) {
-                client.player.sendMessage(Text.literal(message), false);
+                client.player.sendMessage(Text.literal("§b[MissingMinions] §r" + message), false);
             }
         });
     }
