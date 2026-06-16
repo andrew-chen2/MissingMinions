@@ -18,6 +18,34 @@ public class RecipeCalculator {
     // Cache calculated minion costs (minion ID, cost)
     public static final Map<String, Double> COST_CACHE = new HashMap<>();
 
+    // Recipes not found in https://raw.githubusercontent.com/DarthGigi/MinionAH-NotEnoughUpdates-REPO/refs/heads/master/recipes/recipes.json as of 16/06/26
+    public static final Map<String, JsonObject> HARDCODED_RECIPES = new java.util.HashMap<>();
+    static {
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_1", JsonParser.parseString("{\"A1\": \"WATER_LILY:8\", \"A2\": \"WATER_LILY:8\", \"A3\": \"WATER_LILY:8\", \"B1\": \"WATER_LILY:8\", \"B2\": \"FISHING_ROD:1\", \"B3\": \"WATER_LILY:8\", \"C1\": \"WATER_LILY:8\", \"C2\": \"WATER_LILY:8\", \"C3\": \"WATER_LILY:8\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_1\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_2", JsonParser.parseString("{\"A1\": \"WATER_LILY:16\", \"A2\": \"WATER_LILY:16\", \"A3\": \"WATER_LILY:16\", \"B1\": \"WATER_LILY:16\", \"B2\": \"LILY_PAD_GENERATOR_1:1\", \"B3\": \"WATER_LILY:16\", \"C1\": \"WATER_LILY:16\", \"C2\": \"WATER_LILY:16\", \"C3\": \"WATER_LILY:16\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_2\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_3", JsonParser.parseString("{\"A1\": \"WATER_LILY:32\", \"A2\": \"WATER_LILY:32\", \"A3\": \"WATER_LILY:32\", \"B1\": \"WATER_LILY:32\", \"B2\": \"LILY_PAD_GENERATOR_2:1\", \"B3\": \"WATER_LILY:32\", \"C1\": \"WATER_LILY:32\", \"C2\": \"WATER_LILY:32\", \"C3\": \"WATER_LILY:32\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_3\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_4", JsonParser.parseString("{\"A1\": \"WATER_LILY:64\", \"A2\": \"WATER_LILY:64\", \"A3\": \"WATER_LILY:64\", \"B1\": \"WATER_LILY:64\", \"B2\": \"LILY_PAD_GENERATOR_3:1\", \"B3\": \"WATER_LILY:64\", \"C1\": \"WATER_LILY:64\", \"C2\": \"WATER_LILY:64\", \"C3\": \"WATER_LILY:64\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_4\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_5", JsonParser.parseString("{\"A1\": \"ENCHANTED_WATER_LILY:1\", \"A2\": \"ENCHANTED_WATER_LILY:1\", \"A3\": \"ENCHANTED_WATER_LILY:1\", \"B1\": \"ENCHANTED_WATER_LILY:1\", \"B2\": \"LILY_PAD_GENERATOR_4:1\", \"B3\": \"ENCHANTED_WATER_LILY:1\", \"C1\": \"ENCHANTED_WATER_LILY:1\", \"C2\": \"ENCHANTED_WATER_LILY:1\", \"C3\": \"ENCHANTED_WATER_LILY:1\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_5\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_6", JsonParser.parseString("{\"A1\": \"ENCHANTED_WATER_LILY:4\", \"A2\": \"ENCHANTED_WATER_LILY:4\", \"A3\": \"ENCHANTED_WATER_LILY:4\", \"B1\": \"ENCHANTED_WATER_LILY:4\", \"B2\": \"LILY_PAD_GENERATOR_5:1\", \"B3\": \"ENCHANTED_WATER_LILY:4\", \"C1\": \"ENCHANTED_WATER_LILY:4\", \"C2\": \"ENCHANTED_WATER_LILY:4\", \"C3\": \"ENCHANTED_WATER_LILY:4\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_6\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_7", JsonParser.parseString("{\"A1\": \"ENCHANTED_WATER_LILY:8\", \"A2\": \"ENCHANTED_WATER_LILY:8\", \"A3\": \"ENCHANTED_WATER_LILY:8\", \"B1\": \"ENCHANTED_WATER_LILY:8\", \"B2\": \"LILY_PAD_GENERATOR_6:1\", \"B3\": \"ENCHANTED_WATER_LILY:8\", \"C1\": \"ENCHANTED_WATER_LILY:8\", \"C2\": \"ENCHANTED_WATER_LILY:8\", \"C3\": \"ENCHANTED_WATER_LILY:8\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_7\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_8", JsonParser.parseString("{\"A1\": \"ENCHANTED_WATER_LILY:16\", \"A2\": \"ENCHANTED_WATER_LILY:16\", \"A3\": \"ENCHANTED_WATER_LILY:16\", \"B1\": \"ENCHANTED_WATER_LILY:16\", \"B2\": \"LILY_PAD_GENERATOR_7:1\", \"B3\": \"ENCHANTED_WATER_LILY:16\", \"C1\": \"ENCHANTED_WATER_LILY:16\", \"C2\": \"ENCHANTED_WATER_LILY:16\", \"C3\": \"ENCHANTED_WATER_LILY:16\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_8\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_9", JsonParser.parseString("{\"A1\": \"ENCHANTED_WATER_LILY:32\", \"A2\": \"ENCHANTED_WATER_LILY:32\", \"A3\": \"ENCHANTED_WATER_LILY:32\", \"B1\": \"ENCHANTED_WATER_LILY:32\", \"B2\": \"LILY_PAD_GENERATOR_8:1\", \"B3\": \"ENCHANTED_WATER_LILY:32\", \"C1\": \"ENCHANTED_WATER_LILY:32\", \"C2\": \"ENCHANTED_WATER_LILY:32\", \"C3\": \"ENCHANTED_WATER_LILY:32\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_9\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_10", JsonParser.parseString("{\"A1\": \"ENCHANTED_WATER_LILY:64\", \"A2\": \"ENCHANTED_WATER_LILY:64\", \"A3\": \"ENCHANTED_WATER_LILY:64\", \"B1\": \"ENCHANTED_WATER_LILY:64\", \"B2\": \"LILY_PAD_GENERATOR_9:1\", \"B3\": \"ENCHANTED_WATER_LILY:64\", \"C1\": \"ENCHANTED_WATER_LILY:64\", \"C2\": \"ENCHANTED_WATER_LILY:64\", \"C3\": \"ENCHANTED_WATER_LILY:64\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_10\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_11", JsonParser.parseString("{\"A1\": \"CONDENSED_WATER_LILY:1\", \"A2\": \"CONDENSED_WATER_LILY:1\", \"A3\": \"CONDENSED_WATER_LILY:1\", \"B1\": \"CONDENSED_WATER_LILY:1\", \"B2\": \"LILY_PAD_GENERATOR_10:1\", \"B3\": \"CONDENSED_WATER_LILY:1\", \"C1\": \"CONDENSED_WATER_LILY:1\", \"C2\": \"CONDENSED_WATER_LILY:1\", \"C3\": \"CONDENSED_WATER_LILY:1\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_11\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("LILY_PAD_GENERATOR_12", JsonParser.parseString("{\"A1\": \"\", \"A2\": \"\", \"A3\": \"\", \"B1\": \"\", \"B2\": \"LILY_PAD_GENERATOR_11:1\", \"B3\": \"\", \"C1\": \"\", \"C2\": \"GENERATOR_UPGRADE_STONE_LILY_PAD_12:1\", \"C3\": \"\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"LILY_PAD_GENERATOR_12\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_1", JsonParser.parseString("{\"A1\": \"RED_MUSHROOM:10\", \"A2\": \"RED_MUSHROOM:10\", \"A3\": \"RED_MUSHROOM:10\", \"B1\": \"RED_MUSHROOM:10\", \"B2\": \"WOOD_HOE:1\", \"B3\": \"RED_MUSHROOM:10\", \"C1\": \"RED_MUSHROOM:10\", \"C2\": \"RED_MUSHROOM:10\", \"C3\": \"RED_MUSHROOM:10\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_1\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_2", JsonParser.parseString("{\"A1\": \"RED_MUSHROOM:20\", \"A2\": \"RED_MUSHROOM:20\", \"A3\": \"RED_MUSHROOM:20\", \"B1\": \"RED_MUSHROOM:20\", \"B2\": \"MUSHROOM_GENERATOR_1:1\", \"B3\": \"RED_MUSHROOM:20\", \"C1\": \"RED_MUSHROOM:20\", \"C2\": \"RED_MUSHROOM:20\", \"C3\": \"RED_MUSHROOM:20\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_2\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_3", JsonParser.parseString("{\"A1\": \"RED_MUSHROOM:40\", \"A2\": \"RED_MUSHROOM:40\", \"A3\": \"RED_MUSHROOM:40\", \"B1\": \"RED_MUSHROOM:40\", \"B2\": \"MUSHROOM_GENERATOR_2:1\", \"B3\": \"RED_MUSHROOM:40\", \"C1\": \"RED_MUSHROOM:40\", \"C2\": \"RED_MUSHROOM:40\", \"C3\": \"RED_MUSHROOM:40\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_3\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_4", JsonParser.parseString("{\"A1\": \"RED_MUSHROOM:64\", \"A2\": \"RED_MUSHROOM:64\", \"A3\": \"RED_MUSHROOM:64\", \"B1\": \"RED_MUSHROOM:64\", \"B2\": \"MUSHROOM_GENERATOR_3:1\", \"B3\": \"RED_MUSHROOM:64\", \"C1\": \"RED_MUSHROOM:64\", \"C2\": \"RED_MUSHROOM:64\", \"C3\": \"RED_MUSHROOM:64\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_4\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_5", JsonParser.parseString("{\"A1\": \"ENCHANTED_RED_MUSHROOM:1\", \"A2\": \"ENCHANTED_RED_MUSHROOM:1\", \"A3\": \"ENCHANTED_RED_MUSHROOM:1\", \"B1\": \"ENCHANTED_RED_MUSHROOM:1\", \"B2\": \"MUSHROOM_GENERATOR_4:1\", \"B3\": \"ENCHANTED_RED_MUSHROOM:1\", \"C1\": \"ENCHANTED_RED_MUSHROOM:1\", \"C2\": \"ENCHANTED_RED_MUSHROOM:1\", \"C3\": \"ENCHANTED_RED_MUSHROOM:1\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_5\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_6", JsonParser.parseString("{\"A1\": \"ENCHANTED_RED_MUSHROOM:2\", \"A2\": \"ENCHANTED_RED_MUSHROOM:2\", \"A3\": \"ENCHANTED_RED_MUSHROOM:2\", \"B1\": \"ENCHANTED_RED_MUSHROOM:2\", \"B2\": \"MUSHROOM_GENERATOR_5:1\", \"B3\": \"ENCHANTED_RED_MUSHROOM:2\", \"C1\": \"ENCHANTED_RED_MUSHROOM:2\", \"C2\": \"ENCHANTED_RED_MUSHROOM:2\", \"C3\": \"ENCHANTED_RED_MUSHROOM:2\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_6\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_7", JsonParser.parseString("{\"A1\": \"ENCHANTED_RED_MUSHROOM:4\", \"A2\": \"ENCHANTED_RED_MUSHROOM:4\", \"A3\": \"ENCHANTED_RED_MUSHROOM:4\", \"B1\": \"ENCHANTED_RED_MUSHROOM:4\", \"B2\": \"MUSHROOM_GENERATOR_6:1\", \"B3\": \"ENCHANTED_RED_MUSHROOM:4\", \"C1\": \"ENCHANTED_RED_MUSHROOM:4\", \"C2\": \"ENCHANTED_RED_MUSHROOM:4\", \"C3\": \"ENCHANTED_RED_MUSHROOM:4\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_7\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_8", JsonParser.parseString("{\"A1\": \"ENCHANTED_RED_MUSHROOM:8\", \"A2\": \"ENCHANTED_RED_MUSHROOM:8\", \"A3\": \"ENCHANTED_RED_MUSHROOM:8\", \"B1\": \"ENCHANTED_RED_MUSHROOM:8\", \"B2\": \"MUSHROOM_GENERATOR_7:1\", \"B3\": \"ENCHANTED_RED_MUSHROOM:8\", \"C1\": \"ENCHANTED_RED_MUSHROOM:8\", \"C2\": \"ENCHANTED_RED_MUSHROOM:8\", \"C3\": \"ENCHANTED_RED_MUSHROOM:8\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_8\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_9", JsonParser.parseString("{\"A1\": \"ENCHANTED_RED_MUSHROOM:16\", \"A2\": \"ENCHANTED_RED_MUSHROOM:16\", \"A3\": \"ENCHANTED_RED_MUSHROOM:16\", \"B1\": \"ENCHANTED_RED_MUSHROOM:16\", \"B2\": \"MUSHROOM_GENERATOR_8:1\", \"B3\": \"ENCHANTED_RED_MUSHROOM:16\", \"C1\": \"ENCHANTED_RED_MUSHROOM:16\", \"C2\": \"ENCHANTED_RED_MUSHROOM:16\", \"C3\": \"ENCHANTED_RED_MUSHROOM:16\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_9\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_10", JsonParser.parseString("{\"A1\": \"ENCHANTED_RED_MUSHROOM:32\", \"A2\": \"ENCHANTED_RED_MUSHROOM:32\", \"A3\": \"ENCHANTED_RED_MUSHROOM:32\", \"B1\": \"ENCHANTED_RED_MUSHROOM:32\", \"B2\": \"MUSHROOM_GENERATOR_9:1\", \"B3\": \"ENCHANTED_RED_MUSHROOM:32\", \"C1\": \"ENCHANTED_RED_MUSHROOM:32\", \"C2\": \"ENCHANTED_RED_MUSHROOM:32\", \"C3\": \"ENCHANTED_RED_MUSHROOM:32\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_10\"}").getAsJsonObject());
+        HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_11", JsonParser.parseString("{\"A1\": \"ENCHANTED_RED_MUSHROOM:64\", \"A2\": \"ENCHANTED_RED_MUSHROOM:64\", \"A3\": \"ENCHANTED_RED_MUSHROOM:64\", \"B1\": \"ENCHANTED_RED_MUSHROOM:64\", \"B2\": \"MUSHROOM_GENERATOR_10:1\", \"B3\": \"ENCHANTED_RED_MUSHROOM:64\", \"C1\": \"ENCHANTED_RED_MUSHROOM:64\", \"C2\": \"ENCHANTED_RED_MUSHROOM:64\", \"C3\": \"ENCHANTED_RED_MUSHROOM:64\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_11\"}").getAsJsonObject());
+    }
+
     public static double calculateRecipeCost(JsonObject recipe) {
         double totalCost = 0.0;
 
@@ -57,14 +85,36 @@ public class RecipeCalculator {
             return COST_CACHE.get(minionId);
         }
 
+        // Hardcoded uncraftable minions
+        if (minionId.equals("FLOWER_GENERATOR_1")) {
+            double cost = 2_500_000.0;
+            COST_CACHE.put(minionId, cost);
+            return cost;
+        }
+        if (minionId.equals("SNOW_GENERATOR_1")) {
+            double cost = 600_000.0;
+            COST_CACHE.put(minionId, cost);
+            return cost;
+        }
+
         double cost = 0.0;
 
         if (RecipesApi.RECIPES != null && RecipesApi.RECIPES.has(minionId)) {
             try {
                 JsonObject recipeObj = RecipesApi.RECIPES.getAsJsonObject(minionId).getAsJsonObject("recipe");
                 cost = calculateRecipeCost(recipeObj);
+                if (minionId.equals("DARK_OAK_GENERATOR_10")) {
+                    System.out.println(recipeObj.get("A1"));
+                }
             } catch (Exception e) {
                 System.err.println("Failed to parse bulk recipe for: " + minionId);
+            }
+        } else if (HARDCODED_RECIPES.containsKey(minionId)) {
+            try {
+                System.out.println("Falling back to hardcoded recipe for: " + minionId);
+                cost = calculateRecipeCost(HARDCODED_RECIPES.get(minionId));
+            } catch (Exception e) {
+                System.err.println("Failed to parse hardcoded recipe for: " + minionId);
             }
         } else {
             try {
