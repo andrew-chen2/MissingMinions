@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.jspecify.annotations.NonNull;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -56,11 +57,7 @@ public class CollectionsApi {
                                         if (unlockStr.contains(" Minion Recipes")) {
 
                                             // Extract prefix
-                                            String prefix = unlockStr.replace(" Minion Recipes", "").toUpperCase().replace(" ", "_");
-
-                                            // Handle the two weird edge cases where names don't match
-                                            if (prefix.equals("COCOA_BEANS")) prefix = "COCOA";
-                                            if (prefix.equals("SUNFLOWER")) prefix = "FLOWER";
+                                            String prefix = getPrefix(unlockStr);
 
                                             MINION_REQS.put(prefix, new CollectionReq(collId, tierNum));
                                         }
@@ -75,5 +72,18 @@ public class CollectionsApi {
                     System.err.println("Failed to fetch collections.");
                     return null;
                 });
+    }
+
+    private static @NonNull String getPrefix(String unlockStr) {
+        String prefix = unlockStr.replace(" Minion Recipes", "").toUpperCase().replace(" ", "_");
+
+        prefix = switch (prefix) {
+            case "COCOA_BEANS" -> "COCOA";
+            case "CAVE_SPIDER" -> "CAVESPIDER";
+            case "NETHER_WART" -> "NETHER_WARTS";
+            case "END_STONE" -> "ENDER_STONE";
+            default -> prefix;
+        };
+        return prefix;
     }
 }
