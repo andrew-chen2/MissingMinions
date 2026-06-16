@@ -1,6 +1,7 @@
 package com.github.andrewchen2.missingminions.network;
 
 import com.github.andrewchen2.missingminions.util.ChatUtils;
+import com.github.andrewchen2.missingminions.util.MinionLogic;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -96,7 +97,7 @@ public class HypixelApi {
                 unlockedMinions.add(minion.getAsString());
             }
 
-            ChatUtils.sendMessage("§aSuccessfully parsed §e" + unlockedMinions.size() + " §aunlocked minion tiers!");
+            MinionLogic.calculateMissing(unlockedMinions);
         } catch (Exception e) {
             ChatUtils.sendMessage("§cError parsing data.");
         }
