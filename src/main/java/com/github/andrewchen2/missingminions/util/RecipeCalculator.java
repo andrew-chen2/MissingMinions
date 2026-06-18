@@ -132,9 +132,9 @@ public class RecipeCalculator {
 
         double cost = 0.0;
 
-        if (RecipesApi.RECIPES != null && RecipesApi.RECIPES.has(itemId)) {
+        if (!RecipesApi.RECIPES.isEmpty() && RecipesApi.RECIPES.containsKey(itemId)) {
             try {
-                JsonObject recipeObj = RecipesApi.RECIPES.getAsJsonObject(itemId).getAsJsonObject("recipe");
+                JsonObject recipeObj = RecipesApi.RECIPES.get(itemId).getAsJsonObject("recipe");
                 cost = calculateRecipeCost(recipeObj, itemId);
             } catch (Exception e) {
                 System.err.println("Failed to parse bulk recipe for: " + itemId);
