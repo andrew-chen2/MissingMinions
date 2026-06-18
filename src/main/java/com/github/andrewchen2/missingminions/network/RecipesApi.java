@@ -56,7 +56,7 @@ public class RecipesApi {
 
                                     String[] slots;
 
-                                    if (!currentId.contains("_GENERATOR_")) {
+                                    if (currentId.contains("_GENERATOR_")) {
                                         slots = new String[]{"B2"};
                                     } else {
                                         slots = new String[]{"A1", "A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3"};
