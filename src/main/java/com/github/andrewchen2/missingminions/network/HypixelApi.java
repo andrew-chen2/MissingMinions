@@ -6,6 +6,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.jspecify.annotations.NonNull;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -80,13 +81,15 @@ public class HypixelApi {
 
             JsonObject playerStats = members.getAsJsonObject(uuid);
 
-            // Parse minions
-            JsonArray craftedGenerators = null;
-            if (playerStats.has("crafted_generators")) {
-                craftedGenerators = playerStats.getAsJsonArray("crafted_generators");
-            } else if (playerStats.has("player_data") && playerStats.getAsJsonObject("player_data").has("crafted_generators")) {
-                craftedGenerators = playerStats.getAsJsonObject("player_data").getAsJsonArray("crafted_generators");
+            if (!playerStats.has("player_data")) {
+                ChatUtils.sendMessage("§cCould not find player data in profile.");
+                return;
             }
+
+            JsonObject playerData = playerStats.getAsJsonObject("player_data");
+
+            // Parse minions
+            JsonArray craftedGenerators = playerData.getAsJsonArray("crafted_generators");
 
             if (craftedGenerators == null || craftedGenerators.isEmpty()) {
                 ChatUtils.sendMessage("§eYou haven't crafted any minions on this profile yet!");
@@ -94,26 +97,11 @@ public class HypixelApi {
             }
 
             // Get unlocked minions
-            List<String> unlockedMinions = new ArrayList<>();
-
-            for (JsonElement minion : craftedGenerators) {
-                // Can't just use replace() since some minions have an underscore in their name (e.g., MAGMA_CUBE)
-                String raw = minion.getAsString();
-                int lastIdx = raw.lastIndexOf('_');
-                if (lastIdx != -1) {
-                    unlockedMinions.add(raw.substring(0, lastIdx) + "_GENERATOR_" + raw.substring(lastIdx + 1));
-                }
-            }
+            List<String> unlockedMinions = getUnlockedMinions(craftedGenerators);
 
             // Parse collections
             Map<String, Integer> playerCollections = new HashMap<>();
-            JsonArray collTiers = null;
-
-            if (playerStats.has("unlocked_coll_tiers")) {
-                collTiers = playerStats.getAsJsonArray("unlocked_coll_tiers");
-            } else if (playerStats.has("player_data") && playerStats.getAsJsonObject("player_data").has("unlocked_coll_tiers")) {
-                collTiers = playerStats.getAsJsonObject("player_data").getAsJsonArray("unlocked_coll_tiers");
-            }
+            JsonArray collTiers = playerData.getAsJsonArray("unlocked_coll_tiers");
 
             if (collTiers != null) {
                 for (JsonElement coll : collTiers) {
@@ -134,5 +122,19 @@ public class HypixelApi {
         } catch (Exception e) {
             ChatUtils.sendMessage("§cError parsing data.");
         }
+    }
+
+    private static @NonNull List<String> getUnlockedMinions(JsonArray craftedGenerators) {
+        List<String> unlockedMinions = new ArrayList<>();
+
+        for (JsonElement minion : craftedGenerators) {
+            // Can't just use replace() since some minions have an underscore in their name (e.g., MAGMA_CUBE)
+            String raw = minion.getAsString();
+            int lastIdx = raw.lastIndexOf('_');
+            if (lastIdx != -1) {
+                unlockedMinions.add(raw.substring(0, lastIdx) + "_GENERATOR_" + raw.substring(lastIdx + 1));
+            }
+        }
+        return unlockedMinions;
     }
 }
