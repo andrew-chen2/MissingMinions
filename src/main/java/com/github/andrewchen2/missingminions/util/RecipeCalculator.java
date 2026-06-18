@@ -1,6 +1,7 @@
 package com.github.andrewchen2.missingminions.util;
 
 import com.github.andrewchen2.missingminions.config.ModConfig;
+import com.github.andrewchen2.missingminions.network.AuctionApi;
 import com.github.andrewchen2.missingminions.network.BazaarApi;
 import com.github.andrewchen2.missingminions.network.RecipesApi;
 import com.google.gson.JsonElement;
@@ -15,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RecipeCalculator {
-    // Cache calculated minion costs (minion ID, cost)
+    // Cache calculated craft costs (item ID, cost)
     public static final Map<String, Double> COST_CACHE = new HashMap<>();
 
     // Recipes not found in https://raw.githubusercontent.com/DarthGigi/MinionAH-NotEnoughUpdates-REPO/refs/heads/master/recipes/recipes.json as of 16/06/26
@@ -46,7 +47,7 @@ public class RecipeCalculator {
         HARDCODED_RECIPES.put("MUSHROOM_GENERATOR_11", JsonParser.parseString("{\"A1\": \"ENCHANTED_RED_MUSHROOM:64\", \"A2\": \"ENCHANTED_RED_MUSHROOM:64\", \"A3\": \"ENCHANTED_RED_MUSHROOM:64\", \"B1\": \"ENCHANTED_RED_MUSHROOM:64\", \"B2\": \"MUSHROOM_GENERATOR_10:1\", \"B3\": \"ENCHANTED_RED_MUSHROOM:64\", \"C1\": \"ENCHANTED_RED_MUSHROOM:64\", \"C2\": \"ENCHANTED_RED_MUSHROOM:64\", \"C3\": \"ENCHANTED_RED_MUSHROOM:64\", \"type\": \"crafting\", \"count\": 1, \"overrideOutputId\": \"MUSHROOM_GENERATOR_11\"}").getAsJsonObject());
     }
 
-    public static double calculateRecipeCost(JsonObject recipe) {
+    public static double calculateRecipeCost(JsonObject recipe, String craftItemId) {
         double totalCost = 0.0;
 
         // Crafting table slots
@@ -70,13 +71,31 @@ public class RecipeCalculator {
                     } catch (NumberFormatException ignored) {}
                 }
 
-                if (itemId.contains("_GENERATOR_")) {
-                    // Only calculate recursively if config option is enabled
+                // Some tier 1 minions require a (different type of) minion to craft
+                if (itemId.contains("_GENERATOR_") && !craftItemId.endsWith("_GENERATOR_1")) {
+                    // Only calculate (previous minion tiers) recursively if config option is enabled
                     if (ModConfig.useRecursiveCost) {
-                        totalCost += calculateMinionCost(itemId);
+                        totalCost += calculateItemCost(itemId);
                     }
                 } else {
-                    totalCost += (BazaarApi.getBuyPrice(itemId) * amount);
+                    double buyPrice = BazaarApi.getBuyPrice(itemId);
+                    if (buyPrice != 0.0) {
+                        totalCost += (buyPrice * amount);
+                        continue;
+                    }
+
+                    // Try calculating cost using the item's recipe
+                    double craftPrice = calculateItemCost(itemId);
+                    if (craftPrice != 0.0) {
+                        totalCost += (craftPrice * amount);
+                        continue;
+                    }
+
+                    // Finally fallback to lowest BIN price
+                    double auctionPrice = AuctionApi.getLowestBinPrice(itemId);
+                    if (auctionPrice != 0.0) {
+                        totalCost += (auctionPrice * amount);
+                    }
                 }
             }
         }
@@ -85,49 +104,49 @@ public class RecipeCalculator {
     }
 
     // Helper to recursively fetch the previous tier's recipe
-    public static double calculateMinionCost(String minionId) {
+    public static double calculateItemCost(String itemId) {
         // Skip Tier 12 for now
-        if (minionId.contains("12")) return 0.0;
+        if (itemId.contains("12")) return 0.0;
 
         // Check cache
-        if (COST_CACHE.containsKey(minionId)) {
-            return COST_CACHE.get(minionId);
+        if (COST_CACHE.containsKey(itemId)) {
+            return COST_CACHE.get(itemId);
         }
 
         // Hardcoded uncraftable minions
-        if (minionId.equals("FLOWER_GENERATOR_1")) {
+        if (itemId.equals("FLOWER_GENERATOR_1")) {
             double cost = 2_500_000.0;
-            COST_CACHE.put(minionId, cost);
+            COST_CACHE.put(itemId, cost);
             return cost;
         }
-        if (minionId.equals("SNOW_GENERATOR_1")) {
+        if (itemId.equals("SNOW_GENERATOR_1")) {
             double cost = 600_000.0;
-            COST_CACHE.put(minionId, cost);
+            COST_CACHE.put(itemId, cost);
             return cost;
         }
 
         double cost = 0.0;
 
-        if (RecipesApi.RECIPES != null && RecipesApi.RECIPES.has(minionId)) {
+        if (RecipesApi.RECIPES != null && RecipesApi.RECIPES.has(itemId)) {
             try {
-                JsonObject recipeObj = RecipesApi.RECIPES.getAsJsonObject(minionId).getAsJsonObject("recipe");
-                cost = calculateRecipeCost(recipeObj);
+                JsonObject recipeObj = RecipesApi.RECIPES.getAsJsonObject(itemId).getAsJsonObject("recipe");
+                cost = calculateRecipeCost(recipeObj, itemId);
             } catch (Exception e) {
-                System.err.println("Failed to parse bulk recipe for: " + minionId);
+                System.err.println("Failed to parse bulk recipe for: " + itemId);
             }
-        } else if (HARDCODED_RECIPES.containsKey(minionId)) {
+        } else if (HARDCODED_RECIPES.containsKey(itemId)) {
             try {
-                System.out.println("Falling back to hardcoded recipe for: " + minionId);
-                cost = calculateRecipeCost(HARDCODED_RECIPES.get(minionId));
+                System.out.println("Falling back to hardcoded recipe for: " + itemId);
+                cost = calculateRecipeCost(HARDCODED_RECIPES.get(itemId), itemId);
             } catch (Exception e) {
-                System.err.println("Failed to parse hardcoded recipe for: " + minionId);
+                System.err.println("Failed to parse hardcoded recipe for: " + itemId);
             }
         } else {
             try {
-                System.out.println("Falling back to individual fetch for: " + minionId);
+                System.out.println("Falling back to individual fetch for: " + itemId);
                 HttpClient client = HttpClient.newHttpClient();
                 HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/items/" + minionId + ".json"))
+                        .uri(URI.create("https://raw.githubusercontent.com/NotEnoughUpdates/NotEnoughUpdates-REPO/master/items/" + itemId + ".json"))
                         .GET()
                         .build();
 
@@ -137,22 +156,22 @@ public class RecipeCalculator {
                     JsonObject itemJson = JsonParser.parseString(response.body()).getAsJsonObject();
                     // If an item has multiple recipes, they will be in a "recipes" array
                     if (itemJson.has("recipe")) {
-                        cost = calculateRecipeCost(itemJson.getAsJsonObject("recipe"));
+                        cost = calculateRecipeCost(itemJson.getAsJsonObject("recipe"), itemId);
                     } else if (itemJson.has("recipes")) {
                         for (JsonElement recipeElement : itemJson.getAsJsonArray("recipes")) {
                             JsonObject recipeObj = recipeElement.getAsJsonObject();
                             if (recipeObj.has("type") && recipeObj.get("type").getAsString().equals("crafting")) {
-                                cost = calculateRecipeCost(recipeObj);
+                                cost = calculateRecipeCost(recipeObj, itemId);
                             }
                         }
                     }
                 }
             } catch (Exception e) {
-                System.err.println("Failed to fetch minion recipe for: " + minionId);
+                System.err.println("Failed to fetch recipe for: " + itemId);
             }
         }
 
-        COST_CACHE.put(minionId, cost);
+        COST_CACHE.put(itemId, cost);
         return cost;
     }
 }

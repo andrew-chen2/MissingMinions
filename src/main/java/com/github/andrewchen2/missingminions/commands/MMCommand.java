@@ -9,6 +9,8 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallba
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.text.Text;
 
+import java.util.concurrent.CompletableFuture;
+
 public class MMCommand {
     public static void register() {
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
@@ -31,9 +33,11 @@ public class MMCommand {
         // Get player UUID
         String playerUUID = context.getSource().getPlayer().getUuidAsString().replace("-", "");
 
-        // Fetch data (Bazaar, then minions)
-        BazaarApi.fetchBazaarData()
-                .thenRun(() -> HypixelApi.fetchData(playerUUID));
+        // Fetch data (Bazaar and Auctions, then minions)
+        CompletableFuture.allOf(
+                com.github.andrewchen2.missingminions.network.BazaarApi.fetchBazaarData(),
+                com.github.andrewchen2.missingminions.network.AuctionApi.fetchLowestBin()
+        ).thenRun(() -> HypixelApi.fetchData(playerUUID));
 
         return 1; // Successful command execution
     }

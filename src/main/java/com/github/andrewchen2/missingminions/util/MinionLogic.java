@@ -63,7 +63,7 @@ public class MinionLogic {
         List<Minion> missingMinions = new ArrayList<>();
 
         for (String minionId : missingIds) {
-            double cost = RecipeCalculator.calculateMinionCost(minionId);
+            double cost = RecipeCalculator.calculateItemCost(minionId);
 
             // Only add to list if a valid cost was found
             if (cost > 0) {
