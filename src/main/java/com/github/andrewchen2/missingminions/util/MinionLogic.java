@@ -29,7 +29,7 @@ public class MinionLogic {
         RecipeCalculator.COST_CACHE.clear();
 
         List<String> missingIds = new ArrayList<>();
-        for (String minionId : ItemsApi.MASTER_MINION_LIST) {
+        for (String minionId : ItemsApi.MINIONS.keySet()) {
             if (!unlockedMinions.contains(minionId)) {
                 // Collection filter
                 if (ModConfig.filterCollections) {
@@ -82,7 +82,7 @@ public class MinionLogic {
             if (count >= 5) break;
 
             // Nice formatting
-            String cleanName = m.id.replace("_GENERATOR_", " Tier ");
+            String cleanName = ItemsApi.MINIONS.get(m.id);
             String formattedCost = String.format("%,.0f", m.cost);
 
             ChatUtils.sendMessage("§b" + (count + 1) + ". §e" + cleanName + " §7- §6" + formattedCost + " coins");

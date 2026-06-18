@@ -9,12 +9,12 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ItemsApi {
-    // List of minions (generators)
-    public static final List<String> MASTER_MINION_LIST = new ArrayList<>();
+    // Maps minion ID to human-readable name
+    public static final Map<String, String> MINIONS = new HashMap<>();
 
     public static void fetchItems() {
         HttpClient client = HttpClient.newHttpClient();
@@ -30,15 +30,18 @@ public class ItemsApi {
                         if (jsonResponse.has("success") && jsonResponse.get("success").getAsBoolean()) {
                             JsonArray items = jsonResponse.getAsJsonArray("items");
 
-                            MASTER_MINION_LIST.clear();
+                            MINIONS.clear();
 
                             for (JsonElement itemElement : items) {
-                                String id = itemElement.getAsJsonObject().get("id").getAsString();
+                                JsonObject itemObj = itemElement.getAsJsonObject();
+                                String id = itemObj.get("id").getAsString();
+
                                 if (id.contains("_GENERATOR_")) {
-                                    MASTER_MINION_LIST.add(id);
+                                    String name = itemObj.has("name") ? itemObj.get("name").getAsString() : id;
+                                    MINIONS.put(id, name);
                                 }
                             }
-                            System.out.println("[MissingMinions] Successfully cached " + MASTER_MINION_LIST.size() + " minion IDs!");
+                            System.out.println("[MissingMinions] Successfully cached " + MINIONS.size() + " minions!");
                         }
                     }
                 })
