@@ -97,7 +97,12 @@ public class HypixelApi {
             List<String> unlockedMinions = new ArrayList<>();
 
             for (JsonElement minion : craftedGenerators) {
-                unlockedMinions.add(minion.getAsString());
+                // Can't just use replace() since some minions have an underscore in their name (e.g., MAGMA_CUBE)
+                String raw = minion.getAsString();
+                int lastIdx = raw.lastIndexOf('_');
+                if (lastIdx != -1) {
+                    unlockedMinions.add(raw.substring(0, lastIdx) + "_GENERATOR_" + raw.substring(lastIdx + 1));
+                }
             }
 
             // Parse collections
