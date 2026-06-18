@@ -12,6 +12,7 @@ public class ModConfig {
     // Config values
     public static boolean useRecursiveCost = false;
     public static boolean filterCollections = true;
+    public static boolean useBuyOrders = false;
 
     public static void setUseRecursiveCost(boolean newValue) {
         if (useRecursiveCost != newValue) {
@@ -27,6 +28,13 @@ public class ModConfig {
         }
     }
 
+    public static void setUseBuyOrders(boolean newValue) {
+        if (useBuyOrders != newValue) {
+            useBuyOrders = newValue;
+            save();
+        }
+    }
+
     // GSON setup
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "missingminions.json");
@@ -35,6 +43,7 @@ public class ModConfig {
     private static class ConfigData {
         public boolean useRecursiveCost = ModConfig.useRecursiveCost;
         public boolean filterCollections = ModConfig.filterCollections;
+        public boolean useBuyOrders = ModConfig.useBuyOrders;
     }
 
     public static void load() {
@@ -44,6 +53,7 @@ public class ModConfig {
                 if (data != null) {
                     useRecursiveCost = data.useRecursiveCost;
                     filterCollections = data.filterCollections;
+                    useBuyOrders = data.useBuyOrders;
                 }
             } catch (Exception e) {
                 System.err.println("[MissingMinions] Failed to load config.");

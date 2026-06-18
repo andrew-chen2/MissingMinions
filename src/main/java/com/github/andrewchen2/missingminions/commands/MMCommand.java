@@ -17,11 +17,13 @@ public class MMCommand {
                     .then(ClientCommandManager.literal("toggle")
                             .then(ClientCommandManager.literal("recursive").executes(MMCommand::toggleRecursive))
                             .then(ClientCommandManager.literal("filter").executes(MMCommand::toggleFilter))
+                            .then(ClientCommandManager.literal("buyorders").executes(MMCommand::toggleBuyOrders))
                     ));
             dispatcher.register(ClientCommandManager.literal("mm").executes(MMCommand::execute)
                     .then(ClientCommandManager.literal("toggle")
                             .then(ClientCommandManager.literal("recursive").executes(MMCommand::toggleRecursive))
                             .then(ClientCommandManager.literal("filter").executes(MMCommand::toggleFilter))
+                            .then(ClientCommandManager.literal("buyorders").executes(MMCommand::toggleBuyOrders))
                     ));
         });
     }
@@ -57,6 +59,16 @@ public class MMCommand {
 
         String state = ModConfig.filterCollections ? "§aON" : "§cOFF";
         context.getSource().sendFeedback(Text.literal("§9[MissingMinions] §7Collection Filtering is now: " + state));
+
+        return 1;
+    }
+
+    private static int toggleBuyOrders(CommandContext<FabricClientCommandSource> context) {
+        boolean current = ModConfig.useBuyOrders;
+        ModConfig.setUseBuyOrders(!current);
+
+        String state = ModConfig.useBuyOrders ? "§aBUY ORDERS" : "§cINSTA-BUY";
+        context.getSource().sendFeedback(net.minecraft.text.Text.literal("§9[MissingMinions] §7Calculation mode set to: " + state));
 
         return 1;
     }

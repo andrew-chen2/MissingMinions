@@ -1,5 +1,6 @@
 package com.github.andrewchen2.missingminions.network;
 
+import com.github.andrewchen2.missingminions.config.ModConfig;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -12,8 +13,18 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class BazaarApi {
+    public static class PricePair {
+        public double instaBuy;
+        public double buyOrder;
+
+        public PricePair(double instaBuy, double buyOrder) {
+            this.instaBuy = instaBuy;
+            this.buyOrder = buyOrder;
+        }
+    }
+
     // Maps item ID to (instant) buy price
-    public static final Map<String, Double> BAZAAR_PRICES = new HashMap<>();
+    public static final Map<String, PricePair> BAZAAR_PRICES = new HashMap<>();
 
     public static CompletableFuture<Void> fetchBazaarData() {
         HttpClient client = HttpClient.newHttpClient();
@@ -32,13 +43,14 @@ public class BazaarApi {
 
                             BAZAAR_PRICES.clear();
 
-                            // Save only the buy price
+                            // Save only insta-buy and buy order prices
                             for (String itemId : products.keySet()) {
-                                double buyPrice = products.getAsJsonObject(itemId)
-                                        .getAsJsonObject("quick_status")
-                                        .get("buyPrice").getAsDouble();
+                                JsonObject quickStatus = products.getAsJsonObject(itemId).getAsJsonObject("quick_status");
 
-                                BAZAAR_PRICES.put(itemId, buyPrice);
+                                double instaBuy = quickStatus.get("buyPrice").getAsDouble(); // Insta-buy price
+                                double buyOrder = quickStatus.get("sellPrice").getAsDouble(); // Buy order price
+
+                                BAZAAR_PRICES.put(itemId, new PricePair(instaBuy, buyOrder));
                             }
                         }
                     }
@@ -51,6 +63,12 @@ public class BazaarApi {
 
     public static double getBuyPrice(String itemId) {
         String cleanId = itemId.replace("-", ":");
-        return BAZAAR_PRICES.getOrDefault(cleanId, 0.0);
+        PricePair prices = BAZAAR_PRICES.get(cleanId);
+
+        if (prices == null) {
+            return 0.0;
+        }
+
+        return ModConfig.useBuyOrders ? prices.buyOrder : prices.instaBuy;
     }
 }
