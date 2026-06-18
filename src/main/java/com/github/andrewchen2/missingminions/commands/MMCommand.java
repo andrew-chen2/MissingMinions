@@ -1,7 +1,6 @@
 package com.github.andrewchen2.missingminions.commands;
 
 import com.github.andrewchen2.missingminions.config.ModConfig;
-import com.github.andrewchen2.missingminions.network.BazaarApi;
 import com.github.andrewchen2.missingminions.network.HypixelApi;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
