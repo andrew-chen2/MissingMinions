@@ -100,6 +100,11 @@ public class RecipeCalculator {
             }
         }
 
+        // Account for recipes that produce multiple items (e.g., sticks)
+        if (recipe.has("count")) {
+            totalCost = totalCost / recipe.get("count").getAsInt();
+        }
+
         return totalCost;
     }
 
