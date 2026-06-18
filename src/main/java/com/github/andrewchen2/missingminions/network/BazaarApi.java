@@ -7,11 +7,13 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class BazaarApi {
-    // JSON object with all Bazaar prices
-    public static JsonObject BAZAAR_DATA = null;
+    // Maps item ID to (instant) buy price
+    public static final Map<String, Double> BAZAAR_PRICES = new HashMap<>();
 
     public static CompletableFuture<Void> fetchBazaarData() {
         HttpClient client = HttpClient.newHttpClient();
@@ -24,8 +26,20 @@ public class BazaarApi {
                 .thenAccept(response -> {
                     if (response.statusCode() == 200) {
                         JsonObject jsonResponse = JsonParser.parseString(response.body()).getAsJsonObject();
-                        if (jsonResponse.get("success").getAsBoolean()) {
-                            BAZAAR_DATA = jsonResponse.getAsJsonObject("products");
+
+                        if (jsonResponse.has("success") && jsonResponse.get("success").getAsBoolean()) {
+                            JsonObject products = jsonResponse.getAsJsonObject("products");
+
+                            BAZAAR_PRICES.clear();
+
+                            // Save only the buy price
+                            for (String itemId : products.keySet()) {
+                                double buyPrice = products.getAsJsonObject(itemId)
+                                        .getAsJsonObject("quick_status")
+                                        .get("buyPrice").getAsDouble();
+
+                                BAZAAR_PRICES.put(itemId, buyPrice);
+                            }
                         }
                     }
                 })
@@ -35,17 +49,8 @@ public class BazaarApi {
                 });
     }
 
-    // Helper method to get buy price of an item
     public static double getBuyPrice(String itemId) {
-        if (BAZAAR_DATA == null) return 0.0;
-
         String cleanId = itemId.replace("-", ":");
-
-        if (BAZAAR_DATA.has(cleanId)) {
-            return BAZAAR_DATA.getAsJsonObject(cleanId)
-                    .getAsJsonObject("quick_status")
-                    .get("buyPrice").getAsDouble();
-        }
-        return 0.0;
+        return BAZAAR_PRICES.getOrDefault(cleanId, 0.0);
     }
 }
