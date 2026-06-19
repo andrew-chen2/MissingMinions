@@ -2,6 +2,7 @@ package com.github.andrewchen2.missingminions.util;
 
 import com.github.andrewchen2.missingminions.config.ModConfig;
 import com.github.andrewchen2.missingminions.gui.MainScreen;
+import com.github.andrewchen2.missingminions.hud.MainHud;
 import com.github.andrewchen2.missingminions.network.CollectionsApi;
 import com.github.andrewchen2.missingminions.network.ItemsApi;
 import net.minecraft.client.MinecraftClient;
@@ -64,6 +65,8 @@ public class MinionLogic {
 
         // Sort cheapest to most expensive
         missingMinions.sort(Comparator.comparingDouble(m -> m.cost));
+
+        MainHud.setTopMinions(missingMinions);
 
         MinecraftClient.getInstance().execute(() -> {
             if (MinecraftClient.getInstance().currentScreen instanceof MainScreen screen) {
