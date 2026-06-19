@@ -100,9 +100,9 @@ public class MainScreen extends Screen {
         List<MinionEntry> filtered = new ArrayList<>();
 
         for (Minion m : allMissingMinions) {
-            ItemsApi.MinionData data = ItemsApi.MINIONS.get(m.id);
+            ItemsApi.MinionData data = ItemsApi.MINIONS.get(m.id());
 
-            String displayName = (data != null) ? data.displayName() : m.id;
+            String displayName = (data != null) ? data.displayName() : m.id();
             String texture = (data != null) ? data.textureValue() : null;
 
             if (displayName.toLowerCase().contains(lowerQuery)) {
@@ -174,7 +174,7 @@ public class MainScreen extends Screen {
             ItemStack icon = createMinionHead(textureValue);
             context.drawItem(icon, x + 5, y + 2);
 
-            String costText = String.format("%,.0f Coins", minion.cost);
+            String costText = String.format("%,.0f Coins", minion.cost());
             context.drawTextWithShadow(client.textRenderer, displayName, x + 30, y + 5, Colors.LIGHT_YELLOW);
             context.drawTextWithShadow(client.textRenderer, costText, x + 30, y + 16, Colors.GRAY);
 
@@ -195,7 +195,7 @@ public class MainScreen extends Screen {
             // Open the recipe
             ClientPlayerEntity player = MinecraftClient.getInstance().player;
             if (player != null) {
-                player.networkHandler.sendChatCommand("viewrecipe " + minion.id);
+                player.networkHandler.sendChatCommand("viewrecipe " + minion.id());
             }
             return true; // Click handled
         }

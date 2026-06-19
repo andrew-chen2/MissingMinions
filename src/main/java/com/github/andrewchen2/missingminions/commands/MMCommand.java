@@ -47,7 +47,7 @@ public class MMCommand {
 
     private static int toggleRecursive(CommandContext<FabricClientCommandSource> context) {
         boolean current = ModConfig.useRecursiveCost;
-        ModConfig.setUseRecursiveCost(!current); // This automatically saves and clears the cache!
+        ModConfig.setUseRecursiveCost(!current);
 
         String state = ModConfig.useRecursiveCost ? "§aON" : "§cOFF";
         context.getSource().sendFeedback(Text.literal("§9[MissingMinions] §7Recursive Cost Calculation is now: " + state));
@@ -57,7 +57,7 @@ public class MMCommand {
 
     private static int toggleFilter(CommandContext<FabricClientCommandSource> context) {
         boolean current = ModConfig.filterCollections;
-        ModConfig.setFilterCollections(!current); // This automatically saves!
+        ModConfig.setFilterCollections(!current);
 
         String state = ModConfig.filterCollections ? "§aON" : "§cOFF";
         context.getSource().sendFeedback(Text.literal("§9[MissingMinions] §7Collection Filtering is now: " + state));

@@ -13,16 +13,7 @@ import java.util.Map;
 
 public class MinionLogic {
 
-    // Minion data class
-    public static class Minion {
-        public String id;
-        public double cost;
-
-        public Minion(String id, double cost) {
-            this.id = id;
-            this.cost = cost;
-        }
-    }
+    public record Minion(String id, double cost) {}
 
     public static void calculateMissing(List<String> unlockedMinions, Map<String, Integer> playerCollections) {
         // Clear cache
@@ -38,8 +29,8 @@ public class MinionLogic {
 
                     if (req != null) {
                         // Skip this minion if not yet unlocked in collection
-                        int playerTier = playerCollections.getOrDefault(req.collectionId, 0);
-                        if (playerTier < req.tier) {
+                        int playerTier = playerCollections.getOrDefault(req.collectionId(), 0);
+                        if (playerTier < req.tier()) {
                             System.out.println("excluded minion: " + minionId);
                             continue;
                         }

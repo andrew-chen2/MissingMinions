@@ -14,16 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CollectionsApi {
-
-    public static class CollectionReq {
-        public String collectionId;
-        public int tier;
-
-        public CollectionReq(String collectionId, int tier) {
-            this.collectionId = collectionId;
-            this.tier = tier;
-        }
-    }
+    public record CollectionReq(String collectionId, int tier) {}
 
     // Maps item ID (*_GENERATOR_*) prefix to collection requirement
     public static final Map<String, CollectionReq> MINION_REQS = new HashMap<>();

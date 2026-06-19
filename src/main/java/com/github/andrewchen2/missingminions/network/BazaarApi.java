@@ -13,15 +13,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class BazaarApi {
-    public static class PricePair {
-        public double instaBuy;
-        public double buyOrder;
-
-        public PricePair(double instaBuy, double buyOrder) {
-            this.instaBuy = instaBuy;
-            this.buyOrder = buyOrder;
-        }
-    }
+    public record PricePair(double instaBuy, double buyOrder) {}
 
     // Maps item ID to (instant) buy price
     public static final Map<String, PricePair> BAZAAR_PRICES = new HashMap<>();
