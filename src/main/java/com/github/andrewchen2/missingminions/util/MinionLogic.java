@@ -1,8 +1,10 @@
 package com.github.andrewchen2.missingminions.util;
 
 import com.github.andrewchen2.missingminions.config.ModConfig;
+import com.github.andrewchen2.missingminions.gui.MainScreen;
 import com.github.andrewchen2.missingminions.network.CollectionsApi;
 import com.github.andrewchen2.missingminions.network.ItemsApi;
+import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,8 +25,6 @@ public class MinionLogic {
     }
 
     public static void calculateMissing(List<String> unlockedMinions, Map<String, Integer> playerCollections) {
-        ChatUtils.sendMessage("§7Calculating costs for missing minions...");
-
         // Clear cache
         RecipeCalculator.COST_CACHE.clear();
 
@@ -74,23 +74,10 @@ public class MinionLogic {
         // Sort cheapest to most expensive
         missingMinions.sort(Comparator.comparingDouble(m -> m.cost));
 
-        // Output top 5 cheapest
-        ChatUtils.sendMessage("§a=== Top 5 Cheapest Missing Minions ===");
-
-        int count = 0;
-        for (Minion m : missingMinions) {
-            if (count >= 5) break;
-
-            // Nice formatting
-            String cleanName = ItemsApi.MINIONS.get(m.id);
-            String formattedCost = String.format("%,.0f", m.cost);
-
-            ChatUtils.sendMessage("§b" + (count + 1) + ". §e" + cleanName + " §7- §6" + formattedCost + " coins");
-            count++;
-        }
-
-        if (missingMinions.isEmpty()) {
-            ChatUtils.sendMessage("§aImpressive! You've crafted every single minion!");
-        }
+        MinecraftClient.getInstance().execute(() -> {
+            if (MinecraftClient.getInstance().currentScreen instanceof MainScreen screen) {
+                screen.setData(missingMinions);
+            }
+        });
     }
 }

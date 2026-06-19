@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import org.jspecify.annotations.Nullable;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -13,8 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ItemsApi {
+    public record MinionData(String displayName, @Nullable String textureValue) {}
+
     // Maps minion ID to human-readable name
-    public static final Map<String, String> MINIONS = new HashMap<>();
+    public static final Map<String, MinionData> MINIONS = new HashMap<>();
 
     public static void fetchItems() {
         HttpClient client = HttpClient.newHttpClient();
@@ -38,7 +41,13 @@ public class ItemsApi {
 
                                 if (id.contains("_GENERATOR_")) {
                                     String name = itemObj.has("name") ? itemObj.get("name").getAsString() : id;
-                                    MINIONS.put(id, name);
+                                    String texture = null;
+
+                                    if (itemObj.has("skin") && itemObj.getAsJsonObject("skin").has("value")) {
+                                        texture = itemObj.getAsJsonObject("skin").get("value").getAsString();
+                                    }
+
+                                    MINIONS.put(id, new MinionData(name, texture));
                                 }
                             }
                             System.out.println("[MissingMinions] Successfully cached " + MINIONS.size() + " minions!");

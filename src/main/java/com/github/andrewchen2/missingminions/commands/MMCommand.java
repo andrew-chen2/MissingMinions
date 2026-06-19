@@ -1,11 +1,13 @@
 package com.github.andrewchen2.missingminions.commands;
 
 import com.github.andrewchen2.missingminions.config.ModConfig;
+import com.github.andrewchen2.missingminions.gui.MainScreen;
 import com.github.andrewchen2.missingminions.network.HypixelApi;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 
 import java.util.concurrent.CompletableFuture;
@@ -29,7 +31,7 @@ public class MMCommand {
     }
 
     private static int execute(CommandContext<FabricClientCommandSource> context) {
-        context.getSource().sendFeedback(Text.literal("§9[MissingMinions] §7Fetching profile data..."));
+        MinecraftClient.getInstance().execute(() -> MinecraftClient.getInstance().setScreen(new MainScreen()));
 
         // Get player UUID
         String playerUUID = context.getSource().getPlayer().getUuidAsString().replace("-", "");
