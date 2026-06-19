@@ -80,8 +80,8 @@ public class RecipeCalculator {
                         totalCost += calculateItemCost(itemId);
                     }
                 } else {
-                    double buyPrice = BazaarApi.getBuyPrice(itemId);
-                    if (buyPrice != 0.0) {
+                    if (BazaarApi.BAZAAR_PRICES.containsKey(itemId)) {
+                        double buyPrice = BazaarApi.getBuyPrice(itemId);
                         totalCost += (buyPrice * amount);
                         continue;
                     }
