@@ -18,6 +18,8 @@ import java.util.Map;
 public class RecipeCalculator {
     // Cache calculated craft costs (item ID, cost)
     public static final Map<String, Double> COST_CACHE = new HashMap<>();
+    // Keep track of what items are being calculated to prevent an infinite loop
+    private static final java.util.Set<String> CALCULATING = new java.util.HashSet<>();
 
     // Recipes not found in https://raw.githubusercontent.com/DarthGigi/MinionAH-NotEnoughUpdates-REPO/refs/heads/master/recipes/recipes.json as of 16/06/26
     public static final Map<String, JsonObject> HARDCODED_RECIPES = new java.util.HashMap<>();
@@ -118,6 +120,11 @@ public class RecipeCalculator {
             return COST_CACHE.get(itemId);
         }
 
+        if (CALCULATING.contains(itemId)) {
+            return 0.0;
+        }
+        CALCULATING.add(itemId);
+
         // Hardcoded uncraftable minions
         if (itemId.equals("FLOWER_GENERATOR_1")) {
             double cost = 2_500_000.0;
@@ -176,6 +183,7 @@ public class RecipeCalculator {
             }
         }
 
+        CALCULATING.remove(itemId);
         COST_CACHE.put(itemId, cost);
         return cost;
     }
